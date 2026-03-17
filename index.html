@@ -108,6 +108,15 @@
             pointer-events: none;
             z-index: 20;
         }
+        .credit-text {
+            color: #fff;
+            font-size: 8px;
+            margin-top: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+            text-shadow: 1px 1px 0 #000;
+        }
     </style>
 </head>
 <body>
@@ -121,6 +130,7 @@
             <h1 class="text-white text-2xl mb-12 text-center leading-relaxed">FLYING<br>BULLIVAL</h1>
             <button class="btn-retro" onclick="startGame()">START GAME</button>
             <p class="text-white text-[10px] mt-6">Space or Tap to Jump</p>
+            <p class="credit-text">Created by Kanishk batch 2025</p>
         </div>
     </div>
 
@@ -140,6 +150,7 @@
         </div>
 
         <button class="btn-retro" onclick="restartGame()">PLAY AGAIN</button>
+        <p class="credit-text mt-8">Created by Kanishk batch 2025</p>
     </div>
 </div>
 
@@ -172,13 +183,13 @@
         return img;
     });
 
-    // Game Constants
-    const GAME_SPEED = 2.8; // Constant speed
-    const GRAVITY = 0.28;
-    const JUMP = -5.8;
-    const PIPE_SPACING = 220;
+    // Game Constants - Tuned for much easier/proper playing
+    const GAME_SPEED = 1.6;    
+    const GRAVITY = 0.17;       
+    const JUMP = -4.4;          
+    const PIPE_SPACING = 300;   
     const PIPE_WIDTH = 65;
-    const PIPE_GAP = 170;
+    const PIPE_GAP = 210;       
     const BIRD_SIZE = 42;
     const GROUND_HEIGHT = 80;
 
@@ -220,19 +231,15 @@
     function update() {
         if (!isGameRunning || isGameOver) return;
 
-        // Ground movement
         groundOffset = (groundOffset + GAME_SPEED) % 24;
 
-        // Bird movement
         bird.velocity += GRAVITY;
         bird.y += bird.velocity;
 
-        // Ground/Ceiling collision
         if (bird.y + bird.radius > canvas.height - GROUND_HEIGHT || bird.y - bird.radius < 0) {
             endGame();
         }
 
-        // Pipes movement
         if (pipes.length === 0 || canvas.width - pipes[pipes.length - 1].x >= PIPE_SPACING) {
             createPipe();
         }
@@ -240,12 +247,11 @@
         pipes.forEach((pipe) => {
             pipe.x -= GAME_SPEED;
 
-            // Accurate AABB collision for pillars
             const birdRect = {
-                left: bird.x - bird.radius + 6,
-                right: bird.x + bird.radius - 6,
-                top: bird.y - bird.radius + 6,
-                bottom: bird.y + bird.radius - 6
+                left: bird.x - bird.radius + 8,
+                right: bird.x + bird.radius - 8,
+                top: bird.y - bird.radius + 8,
+                bottom: bird.y + bird.radius - 8
             };
 
             const topPipeRect = { left: pipe.x, right: pipe.x + PIPE_WIDTH, top: 0, bottom: pipe.top };
@@ -258,7 +264,6 @@
                 endGame();
             }
 
-            // Score increment
             if (!pipe.passed && pipe.x + PIPE_WIDTH < bird.x) {
                 score++;
                 pipe.passed = true;
@@ -275,30 +280,25 @@
         ctx.fillStyle = "#4c8691";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw Clouds (Simplified shapes from screenshot)
         ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
         drawCloud(50, 100);
         drawCloud(250, 200);
         drawCloud(100, 350);
 
-        // Draw Pipes
         pipes.forEach(pipe => {
-            // Top Pillar (inverted)
             ctx.save();
             ctx.translate(pipe.x + PIPE_WIDTH / 2, pipe.top / 2);
             ctx.scale(1, -1);
             ctx.drawImage(pipe.img, -PIPE_WIDTH / 2, -pipe.top / 2, PIPE_WIDTH, pipe.top);
             ctx.restore();
 
-            // Bottom Pillar
             ctx.drawImage(pipe.img, pipe.x, (canvas.height - GROUND_HEIGHT) - pipe.bottom, PIPE_WIDTH, pipe.bottom);
         });
 
-        // Draw Ground
-        ctx.fillStyle = "#ded895"; // Ground base color
+        ctx.fillStyle = "#ded895"; 
         ctx.fillRect(0, canvas.height - GROUND_HEIGHT, canvas.width, GROUND_HEIGHT);
         
-        ctx.strokeStyle = "#9ea064"; // Ground stripes
+        ctx.strokeStyle = "#9ea064"; 
         ctx.lineWidth = 2;
         for (let i = -groundOffset; i < canvas.width; i += 24) {
             ctx.beginPath();
@@ -307,13 +307,12 @@
             ctx.stroke();
         }
         
-        ctx.fillStyle = "#73bf2e"; // Grass top
+        ctx.fillStyle = "#73bf2e"; 
         ctx.fillRect(0, canvas.height - GROUND_HEIGHT, canvas.width, 15);
 
-        // Draw Bird
         ctx.save();
         ctx.translate(bird.x, bird.y);
-        let rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, bird.velocity * 0.12));
+        let rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, bird.velocity * 0.18));
         ctx.rotate(rotation);
         
         ctx.beginPath();
@@ -322,7 +321,6 @@
         ctx.drawImage(birdImg, -bird.radius, -bird.radius, BIRD_SIZE, BIRD_SIZE);
         ctx.restore();
 
-        // Bird Outline
         ctx.beginPath();
         ctx.arc(bird.x, bird.y, bird.radius, 0, Math.PI * 2);
         ctx.strokeStyle = "white";
@@ -384,7 +382,6 @@
         startGame();
     }
 
-    // Controls
     window.addEventListener('keydown', (e) => {
         if (e.code === 'Space' || e.code === 'ArrowUp') jump();
     });
@@ -400,7 +397,6 @@
         else jump();
     });
 
-    // Initial draw to show the background
     draw();
 
 </script>
